@@ -5,11 +5,12 @@
       <div class="row">
         <div class="col-md-4 mx-auto">
           <div class="input-group">
-            <input v-model="todoText" placeholder="Todo Text" class="form-control">
+            <input v-model="todo.text" @keyup.enter="saveTodo(todo)" @keyup.esc="clearInput" ref="todoInput" placeholder="Todo Text" class="form-control">
             <div class="input-group-append">
-              <button @click="saveTodo" class="btn btn-primary">
-                {{ editTodoId ? 'Save' : 'Add' }}
+              <button v-if="showClearButton" @click="clearInput" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
               </button>
+              <button @click="saveTodo(todo)" class="btn btn-primary">{{ inputButtonText }}</button>
             </div>
           </div>
         </div>
@@ -20,7 +21,7 @@
         <div class="card my-3">
           <div class="card-body d-flex justify-content-between">
             <p>{{ todo.text }}</p>
-            <button @click="editTodo(todo)" class="btn btn-secondary ml-auto mr-2">
+            <button @click="editTodo(todo)" class="btn btn-primary ml-auto mr-2">
               <i class="fas fa-edit"></i>
             </button>
             <button @click="removeTodo(todo.id)" class="btn btn-danger">
@@ -38,44 +39,52 @@
 export default {
   data() {
     return {
-      todoText: null,
-      todos: [
-        { id: 1, text: 'Learn Vue' },
-        { id: 2, text: 'Build a Todo app' },
-      ],
-      nextTodoId: 3,
-      editTodoId: null
+      todo: { id: null, text: null },
+      nextTodoId: 1,
+      edit: false,
+      todos: []
     }
   },
   methods: {
-    addTodo() {
-      this.todos.push({
-        id: this.nextTodoId,
-        text: this.todoText,
-      });
-      this.todoText = null;
-      this.nextTodoId++;
+    addTodo(todo) {
+      todo.id = ++this.nextTodoId;
+      this.todos.push(todo);
+      this.clearInput();
     },
     editTodo(todo) {
-      this.editTodoId = todo.id;
-      this.todoText = todo.text;
+      this.todo = {...todo};
+      this.edit = true;
+      this.$nextTick(() => this.$refs.todoInput.focus());
     },
-    updateTodo() {
-      let todo = this.todos.find((todo) => todo.id === this.editTodoId);
-      todo.text = this.todoText;
-      this.todoText = null;
-      this.editTodoId = null;
+    updateTodo(todo) {
+      this.todos = this.todos.map((obj) => todo.id === obj.id ? todo : obj);
+      this.clearInput();
     },
     removeTodo(id) {
       this.todos = this.todos.filter(todo => todo.id !== id);
+      if (this.edit === true && this.todo.id === id) {
+        this.clearInput();
+      }
     },
-    saveTodo() {
-      if (!this.todoText) return // check if todoText is empty
-      return this.editTodoId 
-        ? this.updateTodo()
-        : this.addTodo();
+    saveTodo(todo) {
+      if (!todo.text) return // check if todo.text is empty
+      return this.edit 
+        ? this.updateTodo(todo)
+        : this.addTodo(todo);
+    },
+    clearInput() {
+      this.todo = { id: null, text: null };
+      this.edit = false;
     }
   },
+  computed: {
+    inputButtonText: function() {
+      return this.edit ? 'Save' : 'Add';
+    },
+    showClearButton: function() {
+      return !!this.todo.text;
+    }
+  }
 }
 </script>
 

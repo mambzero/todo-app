@@ -79,10 +79,10 @@ export default {
   },
   computed: {
     inputButtonText: function() {
-      return this.edit ? 'Save' : 'Add';
+      return this.edit === true ? 'Save' : 'Add';
     },
     showClearButton: function() {
-      return !!this.todo.text;
+      return !!this.todo.text === true;
     }
   }
 }

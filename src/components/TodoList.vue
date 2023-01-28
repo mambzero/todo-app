@@ -1,5 +1,5 @@
 <template>
-  <div class="container my-3">
+  <div class="container my-4">
     <h1 class="text-center my-3">Todo App</h1>
     <div class="my-3">
       <div class="row">

@@ -2,7 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   pages: {
     index: {
-      title: 'Todo App',
+      title: process.env.VUE_APP_TITLE,
       entry: 'src/main.js'
     },
   },
@@ -10,4 +10,5 @@ module.exports = defineConfig({
     extract: process.env.NODE_ENV === 'production'
   },
   transpileDependencies: true,
+  publicPath: process.env.BASE_URL
 })
